@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -13,7 +14,13 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRouts');
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // 1) GLOBAL MiddleWares
+//Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 // security HTTP header
 app.use(helmet());
 // limit request from api
@@ -52,9 +59,6 @@ app.use(
   })
 );
 
-//Serving static files
-app.use(express.static(`${__dirname}/public`));
-
 // Test middleWare
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -71,7 +75,14 @@ app.use((req, res, next) => {
 // app.patch('/api/v1/tours/:id',updateTour);
 // app.delete('/api/v1/tours/:id',deleteTour);
 
-// 3) Routes
+// 3) ROUTES
+
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Mahi',
+  });
+});
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
